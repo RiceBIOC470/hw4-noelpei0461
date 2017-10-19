@@ -37,14 +37,15 @@ ff(21)
 % 3. Write a function that takes the image from (1) and the binary mask
 % from (2) and returns a vector of mean intensities of each circle (hint: use regionprops).
 %
-function zz=fff(im1,im2)
-img1=imread(im1);
-img2=imread(im2);
-s=regionprops(img2,img1,'MeanIntensity');
-centroids=cat(1,s.MeanIntensity);
-zz=centroids;
+function fff(N)
+f
+ff(N)
+img1=imread('rand8bit.tif');
+img2=imread('rand8bit2.tif');
+s=regionprops(img2,img1,'MeanIntensity')
+centroids=cat(1,s.MeanIntensity)
 end
-fff('rand8bit.tif','rand8bit2.tif')
+fff(
 % 4. Plot the mean and standard deviation of the values in your output
 % vector as a function of circle size. Explain your results. 
 function plot(size)
@@ -52,9 +53,7 @@ x=1:Size;
 a=[];
 b=[];
 for i=1:Size
-    f;
-    ff(i);
-    I=fff('rand8bit.tif','rand8bit2.tif');
+    I=fff(i);
     a(i)=mean(I);
     b(i)=std(I);
 end
@@ -82,7 +81,7 @@ end
 
 %To maximum the Z direction intensity, i did Image-stacks-z-project. And
 %then I used Image-stacks-tools-concatenate to concatenate 2 pictures and 2
-%channels. The look up table is in the image-color-apply LUT. Then I saved file using save as function and convert the file
+%channels. Then I saved file using save as function and convert the file
 %into .avi format.
 
 
