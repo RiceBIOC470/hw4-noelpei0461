@@ -12,6 +12,5 @@ for i=1:20
     end
 end
 imshow(imgt2);
-imgt3=im2uint8(imgt2);
-imwrite(imgt3,'rand8bit2.tif','tif');
+imwrite(imgt2,'rand8bit2.tif','tif');
 end
