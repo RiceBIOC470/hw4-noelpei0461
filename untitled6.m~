@@ -1,0 +1,51 @@
+file1='nfkb_movie1.tif';
+reader=bfGetReader(file1);
+
+nt=reader.getSizeT;
+nz=reader.getSizeZ;
+ind=reader.getIndex(0,0,0)+1;
+img_max=bfGetPlane(reader,ind);
+v=VideoWriter('movie1.avi','Uncompressed AVI');
+open(v);
+for tt=1:nt
+    ind=reader.getIndex(0,0,tt-1)+1;
+    img_max=bfGetPlane(reader,ind);
+    for ii=1:nz
+        ind=reader.getIndex(ii-1,0,tt-1)+1;
+        img_now=bfGetPlane(reader,ind);
+        img_max=max(img_max,img_now);
+    end
+    smoothbackground(img_max);%smooth & background for each timepoint
+    autobinary('imsmbg.tif');%autobinary mask
+    clean('BW.tif',5);
+    BW2=imread('BW2.tif')
+    imwrite(BW2,'myMultipageFile2.tif','WriteMode','append');
+    A=im2double(BW2);
+    writeVideo(v,A);%write in a movie
+end
+
+file1='nfkb_movie2.tif';% perform the same code for the second movie
+reader=bfGetReader(file1);
+
+nt=reader.getSizeT;
+nz=reader.getSizeZ;
+ind=reader.getIndex(0,0,0)+1;
+img_max=bfGetPlane(reader,ind);
+v=VideoWriter('movie1.avi','Uncompressed AVI');
+open(v);
+for tt=1:nt
+    ind=reader.getIndex(0,0,tt-1)+1;
+    img_max=bfGetPlane(reader,ind);
+    for ii=1:nz
+        ind=reader.getIndex(ii-1,0,tt-1)+1;
+        img_now=bfGetPlane(reader,ind);
+        img_max=max(img_max,img_now);
+    end
+    smoothbackground(img_max);%smooth & background for each timepoint
+    autobinary('imsmbg.tif');%autobinary mask
+    BW2=clean('BW.tif',5);
+    imwrite(BW2,'myMultipageFile2.tif','WriteMode','append');
+    A=im2double('BW2.tif');
+    writeVideo(v,A);%write in a movie
+end
+close(v)

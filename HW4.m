@@ -29,7 +29,6 @@ for i=1:20
     end
 end
 imshow(imgt2)
-imgt2=im2uint8(imgt2);
 zz=imwrite(imgt2,'rand8bit2.tif','tif')
 end
 
@@ -47,17 +46,18 @@ end
 fff('rand8bit.tif','rand8bit2.tif')
 % 4. Plot the mean and standard deviation of the values in your output
 % vector as a function of circle size. Explain your results. 
-function plot(size)
-x=1:Size;
+function plot1(size)
+x=1:size;
 a=[];
 b=[];
-for i=1:Size
+for i=1:size
     f;
     ff(i);
     I=fff('rand8bit.tif','rand8bit2.tif');
     a(i)=mean(I);
     b(i)=std(I);
 end
+figure;
 plot(x,a);
 hold on;
 plot(x,b);
@@ -172,36 +172,39 @@ projection=img_max;
 % on an image and apply it to the image from (1). Any necessary parameters
 % (e.g. smoothing radius) should be inputs to the function. Choose them
 % appropriately when calling the function.
-function zz=smoothbackground(projection)
+function smoothbackground(projection)
 rad=4;
 sigma=2;
 fgauss=fspecial('gaussian',rad,sigma);
 imsmooth=imfilter(projection,fgauss);
 imbg=imopen(imsmooth,strel('disk',200));
 imsmbg=imsubtract(imsmooth,imbg);
-zz=imsmbg;
+imwrite(imsmbg,'imsmbg.tif');
 end
 
-imsmbg=smoothbackground(projection);
+smoothbackground(projection);
 % 3. Write  a function which automatically determines a threshold  and
 % thresholds an image to make a binary mask. Apply this to your output
 % image from 2. 
 
-function zz=autobinary(I)
-level= mean(prctile(img,80)); 
+function autobinary(I)
+I=imread(I);
+level= mean(prctile(I,80)); %determine the threshold
 BW=I>level;
-zz=BW
+imwrite(BW, 'BW.tif');
 end
 
-BW=autobinary(imsmbg);
+autobinary('imsmbg.tif');
 % 4. Write a function that "cleans up" this binary mask - i.e. no small
 % dots, or holes in nuclei. It should line up as closely as possible with
 % what you perceive to be the nuclei in your image. 
-function zz=clean(I, N)
-zz = imopen(I, strel('disk', N));
+function clean(I, N)
+I=imread(I);
+img = imopen(I, strel('disk', N));
+imwrite(img,'BW2.tif');
 end
 
-C=clean(BW,5);
+clean('BW.tif',5);
 
 % 5. Write a function that uses your image from (2) and your mask from 
 % (4) to get a. the number of cells in the image. b. the mean area of the
@@ -212,12 +215,26 @@ b=imread(mask);
 reader = regionprops(b, a, 'Area', 'MeanIntensity');
 a1 = [reader.Area];
 int = [reader.MeanIntensity];
-cells = length(data);
-area = mean(a1);
-intensity = mean(int);
+cells = length(reader)
+area = mean(a1)
+intensity = mean(int)
 end
 
-ffff(imsmbg,C);
+ffff('imsmbg.tif','BW2.tif');
+
+cells =
+
+    47
+
+
+area =
+
+   1.1555e+03
+
+
+intensity =
+
+   2.4255e+03
 % 6. Apply your function from (2) to make a smoothed, background subtracted
 % image from channel 2 that corresponds to the image we have been using
 % from channel 1 (that is the max intensity projection from the same time point). Apply your
@@ -235,20 +252,32 @@ img_max=bfGetPlane(reader,ind);
         img_max=max(img_max,img_now);
     end
 projection1=img_max;
+imwrite(projection1, 'projection1.tif');
 %projection1 is the picture from channel 2.
-function zz=smoothbackground(projection)
-rad=4;
-sigma=2;
-fgauss=fspecial('gaussian',rad,sigma);
-imsmooth=imfilter(projection,fgauss);
-imbg=imopen(imsmooth,strel('disk',200));
-imsmbg=imsubtract(imsmooth,imbg);
-zz=imsmbg;
-end
-imsmbg=smoothbackground(projection1);
-%smooth and background
-ffff(projection1, imsmbg)
 
+smoothbackground(projection1);
+%smooth and background
+ffff('projection1.tif', 'imsmbg.tif')
+%get answers
+
+%cells =
+
+        4776
+
+
+area =
+
+  219.4273
+
+
+intensity =
+
+   NaN
+
+
+ans =
+
+        4776
 
 % Problem 4. 
 
@@ -272,11 +301,12 @@ for tt=1:nt
         img_now=bfGetPlane(reader,ind);
         img_max=max(img_max,img_now);
     end
-    imsmbg=smoothbackground(img_max);%smooth & background for each timepoint
-    BW=autobinary(imsmbg);%autobinary mask
-    C=clean(BW,5);
-    imwrite(C,'myMultipageFile2.tif','WriteMode','append');
-    A=im2double(C);
+    smoothbackground(img_max);%smooth & background for each timepoint
+    autobinary('imsmbg.tif');%autobinary mask
+    clean('BW.tif',5);
+    BW2=imread('BW2.tif');
+    imwrite(BW2,'myMultipageFile2.tif','WriteMode','append');
+    A=im2double(BW2);
     writeVideo(v,A);%write in a movie
 end
 
@@ -297,14 +327,18 @@ for tt=1:nt
         img_now=bfGetPlane(reader,ind);
         img_max=max(img_max,img_now);
     end
-    imsmbg=smoothbackground(img_max);%smooth & background for each timepoint
-    BW=autobinary(imsmbg);%autobinary mask
-    C=clean(BW,5);
-    imwrite(C,'myMultipageFile2.tif','WriteMode','append');
-    A=im2double(C);
+    smoothbackground(img_max);%smooth & background for each timepoint
+    autobinary('imsmbg.tif');%autobinary mask
+    clean('BW.tif',5);
+    BW2=imread('BW2.tif');
+    imwrite(BW2,'myMultipageFile2.tif','WriteMode','append');
+    A=im2double(BW2);
     writeVideo(v,A);%write in a movie
 end
 close(v)
+
+%movie1 is the desired movie.
+
 % 2. Use a loop to call your function from problem 3, part 5 on each one of
 % these masks and the corresponding images and 
 % get the number of cells and the mean intensities in both
@@ -322,17 +356,17 @@ MI2=[];
 NU2=[];
   for tt=1:nt
     Ind=reader.getIndex(0,0,tt-1)+1;
-    img_max=bfGetPlane(reader,Ind1);
+    img_max=bfGetPlane(reader,Ind);
         for zz=1:nz
-            Ind=reader1.getIndex(zz-1,0,tt-1)+1;
+            Ind=reader.getIndex(zz-1,0,tt-1)+1;
             imgnow=bfGetPlane(reader,Ind);
             img_max=max(img_max,imgnow);
         end
         img_max=im2double(img_max);
-    imsmbg=smoothbackground(img_max);%smooth & background for each timepoint
-    BW=autobinary(imsmbg);%autobinary mask
-    C=clean(BW,5);
-    [number,~,Int]=ffff(imsmbg,C);
+    smoothbackground(img_max);%smooth & background for each timepoint
+    autobinary('imsmbg.tif');%autobinary mask
+    clean('BW.tif',5);
+    [number,~,Int]=ffff('imsmbg.tif','BW2.tif');
     NU1=[number,NU1];
     MI1=[Int,MI1];
   end
@@ -346,17 +380,17 @@ NU2=[];
             img_max2=max(img_max2,imgnow2);
         end
         img_max2=im2double(img_max2);
-    imsmbg2=smoothbackground(img_max2);%smooth & background for each timepoint in channel 2
-    BW2=autobinary(imsmbg2);%autobinary mask
-    C2=clean(BW2,5);
-    [number,~,Int]=ffff(imsmbg2,C2);
+    smoothbackground(img_max2);%smooth & background for each timepoint in channel 2
+    autobinary('imsmbg.tif');%autobinary mask
+    clean('BW.tif',5);
+    [number,~,Int]=ffff('imsmbg.tif','BW2.tif');
     NU2=[number,NU2];
     MI2=[Int,MI2];
   end
 %plot for movie 1-cell
-plot(1:nt, NU1(1, :), 'b.');
+plot(1:nt, NU1(1, :), 'b');
 hold on;
-plot(1:nt, NU2(2, :), 'r.');
+plot(1:nt, NU2(1, :), 'r');
 xlabel('Time');
 ylabel('Number of cells in mask');
 
@@ -373,17 +407,17 @@ MI2=[];
 NU2=[];
   for tt=1:nt
     Ind=reader.getIndex(0,0,tt-1)+1;
-    img_max=bfGetPlane(reader,Ind1);
+    img_max=bfGetPlane(reader,Ind);
         for zz=1:nz
-            Ind=reader1.getIndex(zz-1,0,tt-1)+1;
+            Ind=reader.getIndex(zz-1,0,tt-1)+1;
             imgnow=bfGetPlane(reader,Ind);
             img_max=max(img_max,imgnow);
         end
         img_max=im2double(img_max);
-    imsmbg=smoothbackground(img_max);%smooth & background for each timepoint
-    BW=autobinary(imsmbg);%autobinary mask
-    C=clean(BW,5);
-    [number,~,Int]=ffff(imsmbg,C);
+    smoothbackground(img_max);%smooth & background for each timepoint
+    autobinary('imsmbg.tif');%autobinary mask
+    clean('BW.tif',5);
+    [number,~,Int]=ffff('imsmbg.tif','BW2.tif');
     NU1=[number,NU1];
     MI1=[Int,MI1];
   end
@@ -397,16 +431,16 @@ NU2=[];
             img_max2=max(img_max2,imgnow2);
         end
         img_max2=im2double(img_max2);
-    imsmbg2=smoothbackground(img_max2);%smooth & background for each timepoint in channel 2
-    BW2=autobinary(imsmbg2);%autobinary mask
-    C2=clean(BW2,5);
-    [number,~,Int]=ffff(imsmbg2,C2);
+    smoothbackground(img_max2);%smooth & background for each timepoint in channel 2
+    autobinary('imsmbg.tif');%autobinary mask
+    clean('BW.tif',5);
+    [number,~,Int]=ffff('imsmbg.tif','BW2.tif');
     NU2=[number,NU2];
     MI2=[Int,MI2];
   end
 %plot for movie 2-cell
-plot(1:nt, NU1(1, :), 'b.');
+plot(1:nt, NU1(1, :), 'b');
 hold on;
-plot(1:nt, NU2(2, :), 'r.');
+plot(1:nt, NU2(1, :), 'r');
 xlabel('Time');
 ylabel('Number of cells in mask');

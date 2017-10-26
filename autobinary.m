@@ -1,5 +1,6 @@
 function autobinary(I)
+I=imread(I);
 level=graythresh(I);
 BW=im2bw(I,level);
-imshow(BW,[])
+imwrite(BW, 'BW.tif');
 end
