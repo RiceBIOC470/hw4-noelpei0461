@@ -1,6 +1,23 @@
 %HW4
 %% 
 % Problem 1. 
+%GB comments:
+1a 100
+1b 100
+1c 100
+1d 50 No explanation of the results as the question asks. 
+2a 75 Avi file does not display a max projection across both channels. Only 1 channel is displayed.  
+2b. 70 The output avi only contains the nuclear label. 
+3a. 100
+3b 100
+3c 100
+3d 100
+3e 100
+4a. 100
+4b. 100
+ Overall = 92
+
+
 
 % 1. Write a function to generate an 8-bit image of size 1024x1024 with a random value 
 % of the intensity in each pixel. Call your image rand8bit.tif. 
